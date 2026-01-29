@@ -1,27 +1,20 @@
-#ifndef STEGANOGRAPHY_H
-#define STEGANOGRAPHY_H
-
-#include <string>
 #include <vector>
-#include <iostream>
 #include <cstdint>
+#include <string>
+#include "pixel.h"
 
-// Simulación de un píxel (3 bytes: R, G, B)
-struct Pixel {
-    uint8_t r, g, b;
-};
+#define HEADER 4
 
-// Clase estática para manejar la lógica de ocultamiento
 class Steganography {
 public:
-    // Función principal: Esconde un mensaje en un vector de Píxeles
-    static void hide_message(std::vector<Pixel>& image, const std::string& message);
+  // DESAFÍO 1: Ocultar cualquier archivo (vector de bytes)
+  static void hide_data(std::vector<Pixel>& image, const std::vector<uint8_t>& data);
 
-    // Función auxiliar (Tu reto): Esconde 1 solo caracter en 8 Píxeles
-    static void hide_char(std::vector<Pixel>& pixels, int start_index, char character);
-    
-    // Función de utilidad para ver binario (para debuggear)
-    static void print_binary(unsigned char value);
+  // DESAFÍO 2: Recuperar esos bytes
+  static std::vector<uint8_t> read_data(const std::vector<Pixel>& image);
+
+private:
+  // Auxiliares (Ya las tienes, solo cambia char por uint8_t si quieres ser estricto)
+  static void hide_byte(std::vector<Pixel>& pixels, int start_index, uint8_t byte);
+  static uint8_t read_byte(const std::vector<Pixel>& pixels, int start_index);
 };
-
-#endif
