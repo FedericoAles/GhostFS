@@ -10,8 +10,8 @@
 
 void print_usage() {
   std::cout << "Uso incorrecto.\n";
-  std::cout << "OCULTAR: ./GhostLab.exe hide <imagen.png> <secreto.pdf> <salida.png>\n";
-  std::cout << "LEER:    ./GhostLab.exe read <imagen_con_secreto.png> <recuperado.pdf>\n";
+  std::cout << "OCULTAR: ./bin/GhostLab.exe hide <imagen.png> <secreto.pdf> <salida.png>\n";
+  std::cout << "LEER:    ./bin/GhostLab.exe read <imagen_con_secreto.png> <recuperado.pdf>\n";
 }
 
 int main(int argc, char* argv[]) {

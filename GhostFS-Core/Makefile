@@ -1,7 +1,2 @@
-.PHONY: clean
-
-clean:
-	rm GhostLab.exe
-
 all:
-	g++ src/main.cpp src/steganography.cpp src/image_manager.cpp src/file_manager.cpp -o GhostLab.exe
+	g++ src/main.cpp src/steganography.cpp src/image_manager.cpp src/file_manager.cpp -o bin/GhostLab.exe
