@@ -59,6 +59,10 @@ void Steganography::hide_byte(std::vector<Pixel>& pixels, int start_index, uint8
 
     current_pixel.r = current_pixel.r & 0xFE; // Limpiar el LSB del canal rojo del píxel.
     current_pixel.r = current_pixel.r | bit_to_hide; // Insertar el 'bit_to_hide' en esa posición.
+
+    // -- Alternativa que modifica el MSB, permite ver los bits modificados en la imagen resultante (solo para tests visuales) --
+    //current_pixel.r = current_pixel.r & 0x7F;
+    //current_pixel.r = current_pixel.r | (bit_to_hide << 7);
   }
 }
 
