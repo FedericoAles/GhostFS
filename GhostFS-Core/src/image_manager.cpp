@@ -10,8 +10,8 @@
 
 std::vector<Pixel> ImageManager::load(const std::string& filepath, int& width, int& height) {
   int channels;
-  unsigned char* raw_data = stbi_load(filepath.c_str(), &width, &height, &channels, 3); // Guarda la imagen como una cadena de chars a modo [R, G, B, R, G, ...]
-
+  unsigned char* raw_data = stbi_load(filepath.c_str(), &width, &height, &channels, 3); // Guarda la imagen como una cadena de chars a modo [R, G, B, R, G, ...].
+                                                                                        // Y asigna valores a width y height.
   if (!raw_data) {
     std::cerr << "[ERROR] No se pudo abrir la imagen: " << filepath << std::endl;
     return {};

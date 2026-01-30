@@ -1,42 +1,87 @@
 #include <iostream>
 #include <vector>
-#include <iomanip> // Para imprimir en HEX
+#include <string>
+#include "image_manager.h"
+#include "file_manager.h"
 #include "steganography.h"
 
-// Función auxiliar para ver los bytes en consola
-void print_hex(const std::string& label, const std::vector<uint8_t>& data) {
-  std::cout << label << ": { ";
-  for (uint8_t byte : data) {
-    // Imprime en formato Hexadecimal
-    std::cout << "0x" << std::hex << std::uppercase << (int)byte << " ";
-  }
-  std::cout << "}" << std::dec << std::endl; // Volver a decimal
+// GhostFS CLI
+// Uso: ./ghostfs [hide/read] [imagen_portadora] [archivo_secreto/output] [imagen_salida]
+
+void print_usage() {
+  std::cout << "Uso incorrecto.\n";
+  std::cout << "OCULTAR: ./GhostLab.exe hide <imagen.png> <secreto.pdf> <salida.png>\n";
+  std::cout << "LEER:    ./GhostLab.exe read <imagen_con_secreto.png> <recuperado.pdf>\n";
 }
 
-int main() {
-  std::cout << "=== GHOST-FS: PRUEBA DE DATOS BINARIOS ===" << std::endl;
+int main(int argc, char* argv[]) {
+  if (argc < 4) {
+    print_usage();
+    return 1;
+  }
 
-  // 1. SIMULAMOS UN ARCHIVO
-  std::vector<uint8_t> secret_file = { 0xA1, 0xB2, 0xC3, 0xD4, 0xFF };
-  
-  print_hex("Archivo Original", secret_file);
+  std::string mode = argv[1];        // "hide" o "read"
+  std::string image_path = argv[2];  // La imagen base
+  std::string file_path = argv[3];   // El archivo a esconder o a recuperar
 
-  // 2. PREPARAR LA IMAGEN
-  std::vector<Pixel> image(100, {0, 0, 0}); 
-  
-  std::cout << "\n[INFO] Ocultando datos..." << std::endl;
-  Steganography::hide_data(image, secret_file);
 
-  
-  std::cout << "[INFO] Intentando recuperar datos..." << std::endl;
-  std::vector<uint8_t> recovered_file = Steganography::read_data(image); // = ... (completar)
+  // ------- MODO OCULTAR -------
+  if (mode == "hide") {
+    if (argc != 5) { // Necesitamos un argumento extra para el nombre de salida
+      print_usage();
+      return 1;
+    }
+    std::string output_image_path = argv[4];
 
-  print_hex("Archivo Recuperado", recovered_file);
+    std::cout << "[INFO] Cargando imagen portadora...\n";
+    int width, height;
+    std::vector<Pixel> image = ImageManager::load(image_path, width, height);
+    if (image.empty()) return 1;
 
-  if (secret_file == recovered_file) { 
-    std::cout << "\n[EXITO] Integridad verificada. Los archivos son identicos." << std::endl;
+    std::cout << "[INFO] Leyendo archivo secreto...\n";
+    std::vector<uint8_t> secret_data = FileManager::read_file(file_path);
+    if (secret_data.empty()) {
+      std::cerr << "[ERROR] Archivo secreto vacio o no encontrado.\n";
+      return 1;
+    }
+
+    std::cout << "[INFO] Ocultando " << secret_data.size() << " bytes...\n";
+
+    if (Steganography::hide_data(image, secret_data)) {
+      if (ImageManager::save(output_image_path, image, width, height)) {
+        std::cout << "[EXITO] Secreto guardado en: " << output_image_path << "\n";
+      } else {
+        std::cerr << "[ERROR] Fallo al guardar imagen.\n";
+      }
+    } else {
+      std::cerr << "[ERROR] La imagen es muy chica para este archivo.\n";
+    }
+
+
+  // ------- MODO LEER -------
+  } else if (mode == "read") {
+    std::cout << "[INFO] Cargando imagen...\n";
+    int width, height;
+    std::vector<Pixel> image = ImageManager::load(image_path, width, height);
+    if (image.empty()) return 1;
+
+    std::cout << "[INFO] Extrayendo datos...\n";
+
+    std::vector<uint8_t> recovered_data = Steganography::read_data(image);
+
+    if (!recovered_data.empty()) {
+      if (FileManager::write_file(file_path, recovered_data)) {
+        std::cout << "[EXITO] Archivo recuperado: " << file_path << "\n";
+      } else {
+        std::cerr << "[ERROR] Fallo al escribir archivo en disco.\n";
+      }
+    } else {
+      std::cerr << "[ERROR] No se encontraron datos validos o magic number incorrecto.\n";
+    }
+
   } else {
-    std::cout << "\n[ERROR] Los datos no coinciden o el tamaño esta mal." << std::endl;
+    print_usage();
+    return 1;
   }
 
   return 0;

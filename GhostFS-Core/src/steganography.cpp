@@ -1,12 +1,12 @@
 #include "steganography.h"
 #include <iostream>
 
-void Steganography::hide_data(std::vector<Pixel>& image, const std::vector<uint8_t>& data) {
+bool Steganography::hide_data(std::vector<Pixel>& image, const std::vector<uint8_t>& data) {
   uint32_t file_size = data.size();
 
   if (image.size() < (file_size + HEADER) * 8) { // Cada byte consume 8 pixeles. En el header se indica el tamaño del archivo.
     std::cout << "[ERROR] - El tamaño del archivo es superior al de la imagen." << std::endl;
-    return;
+    return false;
   } 
   
   int pixel_index = 0;
@@ -19,6 +19,7 @@ void Steganography::hide_data(std::vector<Pixel>& image, const std::vector<uint8
     hide_byte(image, pixel_index , data[i]);
     pixel_index += 8;
   }
+  return true;
 }
 
 std::vector<uint8_t> Steganography::read_data(const std::vector<Pixel>& image) {
