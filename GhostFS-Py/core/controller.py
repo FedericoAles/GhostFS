@@ -18,7 +18,7 @@ class GhostController:
     result = subprocess.run(args_str, capture_output=True, text=True) 
       
     if result.returncode == 0:
-      print("[Info] Operación exitosa del Core.")
+      print("[INFO] Operación exitosa del Core.")
       if result.stdout:
         print(f"[C++ Log]:\n{result.stdout}")
       return True

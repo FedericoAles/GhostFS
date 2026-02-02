@@ -1,6 +1,8 @@
 #include "steganography.h"
 #include <iostream>
 
+bool testing = true;
+
 bool Steganography::hide_data(std::vector<Pixel>& image, const std::vector<uint8_t>& data) {
   uint32_t file_size = data.size();
 
@@ -57,12 +59,14 @@ void Steganography::hide_byte(std::vector<Pixel>& pixels, int start_index, uint8
 
     Pixel& current_pixel = pixels[start_index + i]; // Me guardo una referencia a la ubicacion real del pixel actual, no una copia.
 
-    current_pixel.r = current_pixel.r & 0xFE; // Limpiar el LSB del canal rojo del píxel.
-    current_pixel.r = current_pixel.r | bit_to_hide; // Insertar el 'bit_to_hide' en esa posición.
-
-    // -- Alternativa que modifica el MSB, permite ver los bits modificados en la imagen resultante (solo para tests visuales) --
-    //current_pixel.r = current_pixel.r & 0x7F;
-    //current_pixel.r = current_pixel.r | (bit_to_hide << 7);
+    if (testing){
+      // -- Alternativa que modifica el MSB, permite ver los bits modificados en la imagen resultante (solo para tests visuales) --
+      current_pixel.r = current_pixel.r & 0x7F;
+      current_pixel.r = current_pixel.r | (bit_to_hide << 7);
+    } else {
+      current_pixel.r = current_pixel.r & 0xFE;         // Limpiar el LSB del canal rojo del píxel.
+      current_pixel.r = current_pixel.r | bit_to_hide;  // Insertar el 'bit_to_hide' en esa posición.
+    }
   }
 }
 
@@ -70,7 +74,7 @@ uint8_t Steganography::read_byte(const std::vector<Pixel>& pixels, int start_ind
   uint8_t byte_read = 0;
   for (int i = 0; i < 8; ++i) {
     int bit_read = pixels[start_index + i].r & 0x01; // Aislamos el LSB del canal rojo del pixel
-    byte_read = byte_read | (bit_read << i); // Ubicamos el bit en la posicion correcta
+    byte_read = byte_read | (bit_read << i);         // Ubicamos el bit en la posicion correcta
   }
   return byte_read;
 }

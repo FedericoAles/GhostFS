@@ -52,9 +52,11 @@ int main(int argc, char* argv[]) {
         std::cout << "[EXITO] Secreto guardado en: " << output_image_path << "\n";
       } else {
         std::cerr << "[ERROR] Fallo al guardar imagen.\n";
+        return 1;
       }
     } else {
       std::cerr << "[ERROR] La imagen es muy chica para este archivo.\n";
+      return 1;
     }
 
 
@@ -74,9 +76,11 @@ int main(int argc, char* argv[]) {
         std::cout << "[EXITO] Archivo recuperado: " << file_path << "\n";
       } else {
         std::cerr << "[ERROR] Fallo al escribir archivo en disco.\n";
+        return 1;
       }
     } else {
       std::cerr << "[ERROR] No se encontraron datos validos o magic number incorrecto.\n";
+      return 1;
     }
 
   } else {
